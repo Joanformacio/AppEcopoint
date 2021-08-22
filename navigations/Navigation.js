@@ -4,7 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Icon } from 'react-native-elements'
 
 import Maplocations from '../screens/Maplocations'
-import Account from '../screens/Account'
+import Account from '../screens/account/Account'
+import AccountStack from './AccountStak'
 
 const Tab = createBottomTabNavigator()
 
@@ -49,7 +50,7 @@ export default function Navigation() {
                 />
                 <Tab.Screen
                     name="account"
-                    component={Account}
+                    component={AccountStack}
                     options={{ title: "Account" }}
                 />
             </Tab.Navigator>
