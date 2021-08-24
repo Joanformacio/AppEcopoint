@@ -4,13 +4,14 @@ import { useNavigation } from '@react-navigation/native'
 import { Button, Icon, Input } from 'react-native-elements'
 import { validateEmail, validatePassword, validateConfirm } from '../../validations/ValidatesForm'
 import { Registrar } from '../../service/Service'
+import Loading from '../Loading'
 
 export default function RegisterUserForm() {
     const [showPassword, setShowPassword] = useState("false")
     const [formData, setFormData] = useState(initialsValues)
     const [errorEmail, setErrorEmail] = useState("")
     const [errorPassword, setErrorPassword] = useState("")
-    const [errorConfirm, setErrorConfirm] = useState("")
+    const [errorNewuser, setErrorNewuser] = useState("")
     const [loading, setLoading] = useState(false)
 
     const navigation = useNavigation()
@@ -19,12 +20,26 @@ export default function RegisterUserForm() {
         setFormData({ ...formData, [type]: e.nativeEvent.value })
     }
 
-    const doRegistrar = () => {
+    const doRegistrar = async () => {
+        const newUser = {
+            username: "",
+            password: ""
+        }
+
         if (!validateData) {
             return;
         }
+
+        newUser.username = formData.email
+        newUser.password = formData.password
+
         setLoading(true)
-        Registrar(formData)
+
+        const result = await Registrar(newUser)
+        if (result === HttpStatus.UNPROCESSABLE_ENTITY) {
+            setErrorNewuser(result.error)
+            return
+        }
         navigation.navigate("account")
     }
 
@@ -69,7 +84,7 @@ export default function RegisterUserForm() {
                 defaultValue={formData.password}
                 rightIcon={
                     <Icon
-                        type="matirial-community"
+                        type="material-community"
                         name={showPassword ? "eye-off-outline" : "eye-outline"}
                         iconStyle={styles.icon}
                         onPress={() => setShowPassword(!showPassword)}
@@ -84,7 +99,7 @@ export default function RegisterUserForm() {
                 defaultValue={formData.confirm}
                 rightIcon={
                     <Icon
-                        type="matirial-community"
+                        type="material-community"
                         name={showPassword ? "eye-off-outline" : "eye-outline"}
                         iconStyle={styles.icon}
                         onPress={() => setShowPassword(!showPassword)}
@@ -95,6 +110,7 @@ export default function RegisterUserForm() {
                 title="Registrar Nuevo Usuario"
                 containerStyle={styles.btnContainer}
                 buttonStyle={styles.btn}
+                errorMessage={errorNewuser}
                 onPress={() => doRegistrar()}
             />
             <Loading isVisible={loading} text="registrando usuario..." />
@@ -108,10 +124,10 @@ const initialsValues = () => {
 
 const styles = StyleSheet.create({
     form: {
-        martinTop: 30
+        marginTop: 30
     },
     input: {
-        marginTop: 20,
+        marginTop: 15,
         width: "95%",
         alignSelf: "center"
     },
@@ -126,4 +142,5 @@ const styles = StyleSheet.create({
     icon: {
         color: "#c1c1c1"
     }
+
 })

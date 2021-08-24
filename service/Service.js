@@ -1,23 +1,36 @@
 
-import axios from 'react-native-axios';
-//import { } from '@env';
+import axios from 'axios'
 
-/*const NODE_ENV = process.env.NODE_ENV || 'development'
-require('dotenv').config({
-    path: `.env.${NODE_ENV}`
-})*/
+
 
 const baseURL = "http://localhost:8080/api/"
 
 
 export const userLogin = async (data) => {
-    let token
+    var config = {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 5000
+    };
+
+    let result
+
+    result = await axios.post(baseURL + "login", data, config)
+        .then(res => res.data)
+        .catch(err => console.log(err))
+    //console.log(result)
+
+    return result
+}
+
+export const Registrar = async (data) => {
+    let result
     try {
-        token = await axios.post(baseURL + "login", data).then(res => res.data);
+        result = await axios.post(baseURL + "users", data).then(res => res.data);
+        console.log(result);
     } catch (error) {
-        return false
+        return error
     }
-    return token
+    return result
 }
 
 
