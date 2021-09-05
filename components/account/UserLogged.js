@@ -1,52 +1,60 @@
+import { result } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, _View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import { Botton } from 'react-native-elements'
+import { Alert, StyleSheet, Text, View } from 'react-native'
+import { Avatar } from 'react-native-elements'
+import { loadImageFromGallery } from '../../logic/ChangeAvatar'
 
-export default function UserLogged() {
-    const navigation = useNavigation()
 
-    const [loading, setLoading] = useState(false)
-    const [loadingText, setLoadingText] = useState("")
-    const [user, setUser] = useState(null)
-    const [reaload, setReload] = useState(false)
+
+
+export default function UserLogged(foundDataUser, setLoading, setLoadingText) {
+
+    const changeAvatarUser = async () => {
+        const result = await loadImageFromGallery([1, 1]).then(result => result)
+            .catch(console.error("error en load avatar"));
+        if (result) {
+
+        }
+
+    }
+
 
     return (
-        <View style={styles.container}>
-            {
-                user && (
-                    <View>
-                        info user
-                    </View>
-
-                )
-            }
-            <Botton
-                title="Cerrar Sesion"
-                buttonStyle={styles.btnCloseSession}
-                titleStyle={styles.btnCloseSessionTitle}
-                onPress={() => { navigation.navigate("maplocations") }}
+        <View>
+            <Avatar
+                rounded
+                size="large"
+                onPress={changeAvatarUser}
+                source={
+                    foundDataUser.avatar ? { uri: foundDataUser.avatar } : require("../../assets/avatar-default.jpg")
+                }
             />
+            <View style={styles.infoUser}>
+                <Text>
+                    {
+                        foundDataUser.name ? foundDataUser.name : "anónimo"
+                    }
+                </Text>
+                <Text>{foundDataUser.username}</Text>
+            </View>
         </View>
+
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        minHeight: "100%",
-        backgroundColor: "#f9f9f9"
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        backgroundColor: "#f9f9f9",
+        paddingVertical: 30
     },
-    btnCloseSession: {
-        marginTop: 30,
-        borderRadius: 5,
-        backgroundColor: "#FFFFFF",
-        borderTopWidth: 1,
-        borderTopColor: "#442484",
-        borderBottomWidth: 1,
-        borderBottomColor: "#442484",
-        paddingVertical: 10
+    infoUser: {
+        marginLeft: 20
     },
-    btnCloseSessionTitle: {
-        color: "#442484"
+    infoName: {
+        fontWeight: "bold",
+        paddingBottom: 5
     }
 })

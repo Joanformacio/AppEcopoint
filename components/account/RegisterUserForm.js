@@ -17,35 +17,37 @@ export default function RegisterUserForm() {
     const navigation = useNavigation()
 
     const onChange = (e, type) => {
-        setFormData({ ...formData, [type]: e.nativeEvent.value })
+        setFormData({ ...formData, [type]: e.nativeEvent.text })
+
     }
 
     const doRegistrar = async () => {
         const newUser = {
-            username: "",
-            password: ""
+            username: null,
+            password: null
         }
 
         if (!validateData) {
             return;
         }
 
-        newUser.username = formData.email
+        newUser.username = formData.username
         newUser.password = formData.password
 
         setLoading(true)
 
         const result = await Registrar(newUser)
-        if (result === HttpStatus.UNPROCESSABLE_ENTITY) {
+        if (!result) {
             setErrorNewuser(result.error)
             return
         }
-        navigation.navigate("account")
+        setLoading(false)
+        navigation.navigate("account", { screen: "userGuest" })
     }
 
     const validateData = () => {
         let isValid = true
-        let isValidEmail = validateEmail(formData.email)
+        let isValidEmail = validateEmail(formData.username)
         let isValidPassword = validatePassword(formData.password)
         let isValidConfirm = validateConfirm(formData.confirm, formData.password)
         if (!isValidEmail.isValid) {
@@ -71,7 +73,7 @@ export default function RegisterUserForm() {
             <Input
                 containerStyle={styles.input}
                 placeholder="Ingresa tu email..."
-                onChange={(e) => onChange(e, "email")}
+                onChange={(e) => onChange(e, "username")}
                 keyboardType="email-address"
                 errorMessage={errorEmail}
                 defaultValue={formData.email}
@@ -119,7 +121,7 @@ export default function RegisterUserForm() {
 }
 
 const initialsValues = () => {
-    return { email: "", password: "", confirm: "" }
+    return { username: "", password: "", confirm: "" }
 }
 
 const styles = StyleSheet.create({

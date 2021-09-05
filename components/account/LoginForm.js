@@ -1,40 +1,45 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button, Icon, Input } from 'react-native-elements'
-import { useNavigation } from '@react-navigation/native'
-import { userLogin } from '../../service/Service'
 
+import { userLogin, setTokenUser } from '../../service/Service'
 import Loading from '../Loading'
 
-export default function LoginForm() {
+export default function LoginForm({ setUser, navigation, setIsLogin }) {
     const [showPassword, setShowPassword] = useState("false")
-    const [formData, setFormData] = useState(initialsValues)
+    const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorEmail, setErrorEmail] = useState("")
     const [errorPassword, setErrorPassword] = useState("")
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(null)
 
-    const navigation = useNavigation()
+
 
     const onChange = (e, type) => {
-        setFormData({ ...formData, [type]: e.nativeEvent.value })
+        setFormData({ ...formData, [type]: e.nativeEvent.text })
+
     }
 
-    const doLogear = () => {
+    const doLogear = async () => {
+        let result
 
         if (!validateData) {
             return;
         }
         setLoading(true)
-        let isLogin = userLogin(formData)
+
+        result = await userLogin(formData).then((res) => {
+            setTokenUser(res.token)
+            setIsLogin(true)
+
+
+        })
+            .catch((err) => { setErrorEmail(err.message) })
+        setUser(result)
+
+
         setLoading(false)
 
-        if (!isLogin) {
-            setErrorEmail("This user is not registar")
-            return
-        }
-
         navigation.navigate("account")
-
     }
 
     const validateData = () => {
@@ -62,7 +67,7 @@ export default function LoginForm() {
             <Input
                 containerStyle={styles.input}
                 placeholder="Ingresa tu email..."
-                onChange={(e) => onChange(e, "email")}
+                onChange={(e) => onChange(e, "username")}
                 keyboardType="email-address"
                 errorMessage={errorEmail}
                 defaultValue={formData.email}
@@ -84,7 +89,7 @@ export default function LoginForm() {
             />
 
             <Button
-                title="Logger"
+                title="Sing In.."
                 containerStyle={styles.btnContainer}
                 buttonStyle={styles.btn}
                 onPress={() => doLogear()}
@@ -93,9 +98,7 @@ export default function LoginForm() {
         </View>
     )
 }
-const initialsValues = () => {
-    return { email: "", password: "" }
-}
+
 
 const styles = StyleSheet.create({
     container: {
