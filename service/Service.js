@@ -3,35 +3,46 @@ import axios from 'axios'
 import * as SecureStore from 'expo-secure-store'
 
 
+
 const baseURL = "http://192.168.18.57:8080/api/"
 const TOKEN = "token"
 
 export const userLogin = async (data) => {
 
-    try {
-        let config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            timeout: 5000
-        };
-        const result = await axios.post(baseURL + "login", data, config)
-        try {
-            await SecureStore.setItemAsync(TOKEN, result.token)
-        } catch (error) {
-            return error.message
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         }
-        return result
+
+    };
+    try {
+        return await axios.post(baseURL + "login", data, config).then((res) => {
+            const { bearer, nombreUsuario, token } = res.data
+
+            if (token) {
+                SecureStore.setItemAsync(TOKEN, JSON.stringify(token))
+            }
+            const responseUser = {
+                bearer,
+                username: nombreUsuario,
+                token
+            }
+
+            return responseUser
+        })
     } catch (error) {
-        return error.message
+        console.error(" when login", error)
     }
+
+
 
 }
 
 export const FindUser = async (user) => {
 
-    try {
+    if (user != null || user != undefined) {
         let config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -40,49 +51,57 @@ export const FindUser = async (user) => {
             },
             timeout: 5000
         };
-        user = await axios.get(baseURL + "users", user, config)
-        return user
-    } catch (error) {
-        return error.message
-    }
+        try {
 
+            const result = await axios.get(baseURL + "users", user, config)
+
+        } catch (error) {
+            return error.message
+        }
+    } else {
+        console.log("User", user)
+    }
 
 }
 
 export const Registrar = async (data) => {
     let result
     try {
-        result = await axios.post(baseURL + "users", data).then(res => res.data);
-
+        result = await axios.post(baseURL + "users", data).then(res => res);
+        return result
     } catch (error) {
         return error
     }
-    return result
+
 }
 
 
 export const isUserLogged = async () => {
-    const res = {
-        token: "",
-        isLogged: false,
-        err: ""
-    }
+    let isLogged = false
 
     try {
-        res.token = await SecureStore.getItemAsync(TOKEN,)
-        res.isLogged = true
+        let token = await SecureStore.getItemAsync(TOKEN,).then(res => res)
+
+        if (token) isLogged = true
+
     } catch (error) {
-        res.err = error.message
-        res.isLogged = false
+        console.error(error)
+
     }
 
+    return isLogged
 
-    return res
 }
 
 export const closeSession = async () => {
 
-    await SecureStore.deleteItemAsync(TOKEN)
+    try {
+        return await SecureStore.deleteItemAsync(TOKEN).then(res => {
+            console.log("close session")
+        })
+    } catch (error) {
+        console.error("Error in close session", error)
+    }
 
 }
 

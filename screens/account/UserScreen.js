@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
 import { Button } from 'react-native-elements'
 import Toast from 'react-native-easy-toast'
 
@@ -8,7 +7,7 @@ import UserLogged from '../../components/account/UserLogged'
 import AccountOptions from '../../components/account/AccountOptions'
 import { closeSession, FindUser } from './../../service/Service';
 
-export default function UserScreen({ user, navigation, setIsLogin }) {
+export default function UserScreen({ user, navigation }) {
     const toastRef = useRef()
 
     const [loading, setLoading] = useState(false)
@@ -16,11 +15,17 @@ export default function UserScreen({ user, navigation, setIsLogin }) {
     const [reaload, setReload] = useState(false)
     const [foundDataUser, setFoundDataUser] = useState();
 
+
+
     const toCloseSessionuser = () => {
+
         try {
-            closeSession()
-            setIsLogin(false)
-        } catch { (console.error()) }
+            closeSession().then(res => res)
+            navigation.navigate("userGuest")
+
+        } catch (error) {
+            console.error(error)
+        }
 
 
     }

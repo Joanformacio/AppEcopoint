@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useFocusEffect } from '@react-navigation/native';
-import { result, set } from 'lodash';
-import { isUserLogged, FindUser } from '../../service/Service';
+
+import { isUserLogged } from '../../service/Service';
 import LoginForm from '../../components/account/LoginForm'
 import UserScreen from './UserScreen'
 
@@ -13,24 +13,38 @@ import UserScreen from './UserScreen'
 export default function Login() {
     const navigation = useNavigation()
     const [isLogin, setIsLogin] = useState(null)
-    const [user, setUser] = useState()
+    const [user, setUser] = useState({
+        bearer: "",
+        token: "",
+        username: ""
+    })
 
 
-
+    console.log(user)
     useFocusEffect(
         useCallback(() => {
-            async function isLogged() {
+            async function getUserLogged() {
                 try {
-                    return await isUserLogged()
-                } catch (err) {
-                    console.log(err.message)
+                    const res = await isUserLogged().then(res => res)
+
+                    setIsLogin(res)
+
+                } catch (error) {
+                    console.error(error)
                 }
             }
-            const result = isLogged()
-            console.log("llamada desde usefocus" + result)
+            try {
+                getUserLogged()
+
+            } catch (error) {
+                console.error("No esta logueado", error)
+            }
+
+
         }, [])
+
     )
-    setUser(user)
+
 
 
     return (
@@ -43,7 +57,7 @@ export default function Login() {
             <View>
                 {
                     isLogin ? <UserScreen user={user} navigation={navigation} setIsLogin={setIsLogin} /> :
-                        <LoginForm setUser={setUser} navigation={navigation} setIsLogin={setIsLogin} />
+                        <LoginForm setUser={setUser} user={user} navigation={navigation} />
                 }
 
                 <CreateAccount />

@@ -5,7 +5,7 @@ import { Button, Icon, Input } from 'react-native-elements'
 import { userLogin, setTokenUser } from '../../service/Service'
 import Loading from '../Loading'
 
-export default function LoginForm({ setUser, navigation, setIsLogin }) {
+export default function LoginForm({ setUser, user, navigation }) {
     const [showPassword, setShowPassword] = useState("false")
     const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorEmail, setErrorEmail] = useState("")
@@ -19,27 +19,28 @@ export default function LoginForm({ setUser, navigation, setIsLogin }) {
 
     }
 
-    const doLogear = async () => {
-        let result
+    const doLogear = () => {
+
 
         if (!validateData) {
             return;
         }
         setLoading(true)
 
-        result = await userLogin(formData).then((res) => {
-            setTokenUser(res.token)
-            setIsLogin(true)
+        try {
+            userLogin(formData).then((res) => {
+                return setUser(...user, res)
+            })
 
 
-        })
-            .catch((err) => { setErrorEmail(err.message) })
-        setUser(result)
+        } catch (error) {
 
+            console.log(error)
+        }
 
         setLoading(false)
 
-        navigation.navigate("account")
+        navigation.navigate("userGuest")
     }
 
     const validateData = () => {
@@ -92,7 +93,7 @@ export default function LoginForm({ setUser, navigation, setIsLogin }) {
                 title="Sing In.."
                 containerStyle={styles.btnContainer}
                 buttonStyle={styles.btn}
-                onPress={() => doLogear()}
+                onPress={doLogear}
             />
             <Loading isVisible={loading} text="Iniciando Sesión..." />
         </View>
