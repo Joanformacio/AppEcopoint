@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -14,13 +14,12 @@ export default function Login() {
     const navigation = useNavigation()
     const [isLogin, setIsLogin] = useState(null)
     const [user, setUser] = useState({
-        bearer: "",
-        token: "",
-        username: ""
+        username: "",
+        token: ""
     })
 
 
-    console.log(user)
+
     useFocusEffect(
         useCallback(() => {
             async function getUserLogged() {
@@ -28,7 +27,7 @@ export default function Login() {
                     const res = await isUserLogged().then(res => res)
 
                     setIsLogin(res)
-
+                    console.log(isLogin)
                 } catch (error) {
                     console.error(error)
                 }
@@ -40,9 +39,7 @@ export default function Login() {
                 console.error("No esta logueado", error)
             }
 
-
         }, [])
-
     )
 
 
@@ -56,8 +53,8 @@ export default function Login() {
             />
             <View>
                 {
-                    isLogin ? <UserScreen user={user} navigation={navigation} setIsLogin={setIsLogin} /> :
-                        <LoginForm setUser={setUser} user={user} navigation={navigation} />
+                    isLogin ? <UserScreen navigation={navigation} /> :
+                        <LoginForm navigation={navigation} setUser={setUser} user={user} />
                 }
 
                 <CreateAccount />
@@ -84,7 +81,7 @@ function CreateAccount() {
 
 const styles = StyleSheet.create({
     image: {
-        height: 150,
+        height: 100,
         width: "100%",
         marginBottom: 20
     },

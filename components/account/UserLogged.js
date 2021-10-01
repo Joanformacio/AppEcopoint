@@ -1,41 +1,65 @@
-import { result } from 'lodash'
-import React, { useState } from 'react'
+
+import React, { useState, useEffect } from 'react'
 import { Alert, StyleSheet, Text, View } from 'react-native'
 import { Avatar } from 'react-native-elements'
-import { loadImageFromGallery } from '../../logic/ChangeAvatar'
+import { result } from 'lodash'
+import { loadImageFromGallery } from '../../logic/getImagePhone'
+import { getAvatarUser } from '../../service/Service'
 
 
 
 
-export default function UserLogged(foundDataUser, setLoading, setLoadingText) {
+export default function UserLogged({ dataUser, setLoading, setLoadingText }) {
+    const { avatar, username, name, surname, id } = dataUser
+    const [urlavatar, setUrlavatar] = useState("")
 
-    const changeAvatarUser = async () => {
-        const result = await loadImageFromGallery([1, 1]).then(result => result)
-            .catch(console.error("error en load avatar"));
-        if (result) {
+    let urlStorage = "file:///data/user/0/host.exp.exponent/cache/ExperienceData/UNVERIFIED-192.168.18.57-ecopoint/ImagePicker/"
+    const params = { userAvatar: avatar, username }
 
+    /*useEffect(() => {
+        const getImageavatar = async () => {
+            const imageAvatar = await getAvatarUser(params).then(res => res)
+            console.log(imageAvatar)
         }
+        getImageavatar()
+    }, [])*/
+
+    const getAvatarUser = async () => {
+        try {
+            let result = await loadImageFromGallery([1, 1]).then(result => result)
+            const { status, image } = result
+            if (!status) {
+                return
+            }
+            setLoadingText(prevText => { prevText, "Actualizando imagen.." })
+            setUrlavatar(image)
+
+
+        } catch (error) {
+            console.error(error)
+        }
+        console.log("funcion de reload foto")
 
     }
 
 
     return (
-        <View>
+        <View style={styles.container}>
             <Avatar
                 rounded
                 size="large"
-                onPress={changeAvatarUser}
+                onPress={getAvatarUser}
                 source={
-                    foundDataUser.avatar ? { uri: foundDataUser.avatar } : require("../../assets/avatar-default.jpg")
+                    urlavatar ? { uri: urlavatar } : require("../../assets/avatar-default.jpg")
                 }
             />
             <View style={styles.infoUser}>
-                <Text>
+                <Text style={styles.infoName}>
                     {
-                        foundDataUser.name ? foundDataUser.name : "anónimo"
+                        name ? name : "anónimo"
                     }
                 </Text>
-                <Text>{foundDataUser.username}</Text>
+                <Text>{username}</Text>
             </View>
         </View>
 

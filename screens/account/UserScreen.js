@@ -1,20 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from 'react-native-elements'
+import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-easy-toast'
 
 import UserLogged from '../../components/account/UserLogged'
 import AccountOptions from '../../components/account/AccountOptions'
-import { closeSession, FindUser } from './../../service/Service';
+import { closeSession, FindUser, getCurrentUser } from './../../service/Service';
 
-export default function UserScreen({ user, navigation }) {
+const initialUser = {
+    username: "",
+    token: ""
+}
+
+const initialDataUser = {
+    id: "",
+    username: "",
+    name: "",
+    surname: "",
+    avatar: ""
+}
+
+export default function UserScreen({ navigation }) {
     const toastRef = useRef()
 
     const [loading, setLoading] = useState(false)
     const [loadingText, setLoadingText] = useState("")
     const [reaload, setReload] = useState(false)
-    const [foundDataUser, setFoundDataUser] = useState();
-
+    const [currentUser, setCurrentUser] = useState(initialUser)
+    const [dataUser, setDataUser] = useState(initialDataUser)
 
 
     const toCloseSessionuser = () => {
@@ -27,33 +41,59 @@ export default function UserScreen({ user, navigation }) {
             console.error(error)
         }
 
-
+    }
+    const getUserLogged = async () => {
+        return await getCurrentUser().then((current) => {
+            const { nombreUsuario: username, token } = current
+            setCurrentUser(prevCurrent => ({ ...prevCurrent, username, token }))
+        })
+        return
     }
 
+    const getDataUser = useCallback(async () => {
+        return await FindUser(currentUser).then((user) => {
+
+            const { avatar, username, name, surname, id } = user.data
+            setDataUser({ ...dataUser, avatar, username, name, surname, id })
+
+        })
+
+
+    })
+
     useEffect(() => {
-        if (user !== null) {
-            const getUser = async () => {
-                await FindUser(user).then(res => {
-                    if (res != null) { setFoundDataUser(res) }
-                })
-            }
-            getUser()
+        try {
+            getUserLogged()
+        } catch (error) {
+            console.error(error.message)
         }
 
     }, [])
 
+    useEffect(() => {
+        try {
+            getDataUser()
+        } catch (error) {
+            console.error(error.message)
+        }
+
+    }, [currentUser?.username])
+
+
+
+
     return (
         <View style={styles.container}>
             {
-                user && (
+                dataUser && (
                     <View>
                         <UserLogged
-                            foundDataUser={foundDataUser}
+                            dataUser={dataUser}
                             setLoading={setLoading}
                             setLoadingText={setLoadingText}
                         />
                         <AccountOptions
-                            user={user}
+                            dataUser={dataUser}
                             toastRef={toastRef}
                             setReload={setReload}
                         />

@@ -17,7 +17,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to let user put a photo in his profile page."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,11 +28,12 @@
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
+        "CAMERA",
         "CAMERA_ROLL",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "LOCATION",
-        "ACCESS_COARSE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
       ]
     },
     "web": {

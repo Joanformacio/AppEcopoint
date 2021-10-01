@@ -1,16 +1,18 @@
 
 import axios from 'axios'
 import * as SecureStore from 'expo-secure-store'
+import { result } from 'lodash'
 
 
 
 const baseURL = "http://192.168.18.57:8080/api/"
-const TOKEN = "token"
+const USER = "user"
+
 
 export const userLogin = async (data) => {
 
 
-    const config = {
+    let config = {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -18,49 +20,52 @@ export const userLogin = async (data) => {
 
     };
     try {
-        return await axios.post(baseURL + "login", data, config).then((res) => {
-            const { bearer, nombreUsuario, token } = res.data
+        const res = await axios.post(baseURL + "login", data, config)
 
-            if (token) {
-                SecureStore.setItemAsync(TOKEN, JSON.stringify(token))
-            }
-            const responseUser = {
-                bearer,
-                username: nombreUsuario,
-                token
-            }
+        const user = res.data
 
-            return responseUser
-        })
+        if (user) {
+            await SecureStore.setItemAsync(USER, JSON.stringify(user))
+
+        }
+        return res.data
+
     } catch (error) {
         console.error(" when login", error)
     }
 
-
-
 }
 
 export const FindUser = async (user) => {
+    const data = {
+        username: ""
+    }
 
     if (user != null || user != undefined) {
-        let config = {
+        const { username, token } = user
+        let myToken = 'Bearer '.concat(token)
+
+        data.username = JSON.stringify(username)
+        const config = {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': user.bearer + user.token
-            },
-            timeout: 5000
-        };
+                'Authorization': `${myToken}`
+            }
+        }
+
         try {
 
-            const result = await axios.get(baseURL + "users", user, config)
+            const response = await axios.get(baseURL + "users", config)
 
+            return response
         } catch (error) {
             return error.message
         }
     } else {
         console.log("User", user)
     }
+
 
 }
 
@@ -80,9 +85,9 @@ export const isUserLogged = async () => {
     let isLogged = false
 
     try {
-        let token = await SecureStore.getItemAsync(TOKEN,).then(res => res)
+        let user = await SecureStore.getItemAsync(USER,).then(res => res)
 
-        if (token) isLogged = true
+        if (user) isLogged = true
 
     } catch (error) {
         console.error(error)
@@ -96,7 +101,7 @@ export const isUserLogged = async () => {
 export const closeSession = async () => {
 
     try {
-        return await SecureStore.deleteItemAsync(TOKEN).then(res => {
+        return await SecureStore.deleteItemAsync(USER).then(res => {
             console.log("close session")
         })
     } catch (error) {
@@ -105,11 +110,60 @@ export const closeSession = async () => {
 
 }
 
-export const setTokenUser = async (userToken) => {
-    await SecureStore.setItemAsync(TOKEN, userToken)
+export const getAvatarUser = async (params) => {
+    //Solicitut de la imatge del usuari
+    let userAvatar = params.userAvatar
+    return await axios({
+        method: 'GET',
+        url: `${baseURL}` + 'users/avatar/',
+        params: {
+            userAvatar,
+            username
+        }
+    })
+
 }
 
-export const updateUser = async (user, authorizeToken) => {
-    //logica de actualizar usuario
+export const saveAvatarUsuari = async (imatge, nomavatar) => {
+    //codi guardar imatge
+}
+
+export const getCurrentUser = async () => {
+    let user = {}
+    try {
+        user = await SecureStore.getItemAsync(USER,).then(res => res)
+    } catch (error) {
+        console.error("Error get current user storage", error)
+    }
+
+    return JSON.parse(user)
+}
+
+export const updateUser = async (user, token) => {
+    if (user != null || user != undefined) {
+
+        let myToken = 'Bearer '.concat(token)
+
+        data.username = JSON.stringify(username)
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `${myToken}`
+            }
+        }
+
+        try {
+
+            //const response = await axios.put(baseURL + "users", user, config)
+
+            return response = "service to back end"
+        } catch (error) {
+            return error.message
+        }
+    } else {
+        console.log("User", user)
+    }
+
 }
 

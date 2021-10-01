@@ -1,14 +1,16 @@
 import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions'
+import { camera } from 'expo-camera';
 import { Alert } from 'react-native'
 
 
 export const loadImageFromGallery = async (array) => {
     const response = { status: false, image: null }
-    const resultPermissions = await Permissions.askAsync(Permissions.CAMERA)
-    if (resultPermissions.status === "denied") {
-        Alert.alert("Debes de darle permiso para accerder a las imágenes del teléfono.")
-        return response
+
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+        alert("Permission to access camera roll is required!");
+        return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,

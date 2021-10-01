@@ -1,16 +1,17 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { Button, Icon, Input } from 'react-native-elements'
 
-import { userLogin, setTokenUser } from '../../service/Service'
+import { userLogin } from '../../service/Service'
 import Loading from '../Loading'
 
-export default function LoginForm({ setUser, user, navigation }) {
-    const [showPassword, setShowPassword] = useState("false")
+export default function LoginForm({ navigation }) {
+    const [showPassword, setShowPassword] = useState(false)
     const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorEmail, setErrorEmail] = useState("")
     const [errorPassword, setErrorPassword] = useState("")
     const [loading, setLoading] = useState(null)
+
 
 
 
@@ -19,7 +20,7 @@ export default function LoginForm({ setUser, user, navigation }) {
 
     }
 
-    const doLogear = () => {
+    const doLogear = async () => {
 
 
         if (!validateData) {
@@ -28,25 +29,24 @@ export default function LoginForm({ setUser, user, navigation }) {
         setLoading(true)
 
         try {
-            userLogin(formData).then((res) => {
-                return setUser(...user, res)
-            })
 
+            await userLogin(formData).then(res => res)
 
         } catch (error) {
 
-            console.log(error)
+            console.log(error.message)
         }
-
+        console.log("loginform")
         setLoading(false)
+
 
         navigation.navigate("userGuest")
     }
 
     const validateData = () => {
         let isValid = true
-        let isValidEmail = validateEmail(formData.email)
-        let isValidPassword = validatePassword(formData.password)
+        let isValidEmail = isValidateEmail(formData.username)
+        let isValidPassword = isValidatePassword(formData.password)
 
         if (!isValidEmail.isValid) {
             setErrorEmail(isValidEmail.message)
