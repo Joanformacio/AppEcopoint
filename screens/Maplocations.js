@@ -1,12 +1,26 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import MyMap from '../components/mapcomponets/MyMap'
+import AddLocation from '../components/mapcomponets/AddLocation'
 
 export default function Maplocations() {
     return (
-        <View>
-            <Text>Maplocations</Text>
+        //afegir scroll lateral
+        //a aadlocation s'ha de fixar a la cantonada dreta de la pantalla
+        <View style={styles.container}>
+            <MyMap>
+                <AddLocation />
+            </MyMap>
         </View>
     )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+
+})
