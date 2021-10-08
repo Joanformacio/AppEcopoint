@@ -4,15 +4,13 @@ import { ListItem, Icon } from 'react-native-elements'
 import { map } from 'lodash'
 
 import Modal from '../Modal'
-import UpdateNameSurname from '../account/UpdateNameSurname'
-
-import UpdateUsername from '../account/UpdateUsername'
+import UpdateNameSurname from './UpdateNameSurname'
 import UpdatePassword from '../account/UpdatePassword'
 
 
-export default function AccountOptions({ user, toastRef, setReloadUser }) {
-    const [showModal, setShowModal] = useState()
-    const [renderComponent, setRenderComponent] = useState()
+export default function AccountOptions({ dataUser, toastRef, setReloadUser }) {
+    const [showModal, setShowModal] = useState(false)
+    const [renderComponent, setRenderComponent] = useState(null)
 
     const generateOptions = () => {
         return [
@@ -22,17 +20,7 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
                 iconColorLeft: "#a7bfd3",
                 iconNameRight: "chevron-right",
                 iconColorRight: "#a7bfd3",
-                onPress: () => selectedComponent("updateNameSurname")
-
-            },
-
-            {
-                title: "Change your username",
-                iconNameLeft: "account-circle",
-                iconColorLeft: "#a7bfd3",
-                iconNameRight: "chevron-right",
-                iconColorRight: "#a7bfd3",
-                onPress: () => selectedComponent("updateUsername")
+                onPress: () => selectedComponent("namesurname")
 
             },
             {
@@ -41,7 +29,7 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
                 iconColorLeft: "#a7bfd3",
                 iconNameRight: "chevron-right",
                 iconColorRight: "#a7bfd3",
-                onPress: () => selectedComponent("updatePassword")
+                onPress: () => selectedComponent("password")
 
             },
 
@@ -52,10 +40,10 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
 
     const selectedComponent = (key) => {
         switch (key) {
-            case "updateNameSurname":
+            case "namesurname":
                 setRenderComponent(
                     <UpdateNameSurname
-                        name={user.name}
+                        dataUser={dataUser}
                         setShowModal={setShowModal}
                         toastRef={toastRef}
                         setReloadUser={setReloadUser}
@@ -64,20 +52,10 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
                 )
                 break;
 
-            case "updateUsername":
-                setRenderComponent(
-                    <UpdateUsername
-                        username={user.username}
-                        setShowModal={setShowModal}
-                        toastRef={toastRef}
-                        setReloadUser={setReloadUser}
-                    />
-                )
-                break;
-            case "updatePassword":
+            case "password":
                 setRenderComponent(
                     <UpdatePassword
-                        password={user.password}
+                        dataUser={dataUser}
                         setShowModal={setShowModal}
                         toastRef={toastRef}
                         setReloadUser={setReloadUser}
@@ -85,13 +63,14 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
                 )
                 break;
         }
+        setShowModal(true)
     }
 
     const menuOptions = generateOptions()
     return (
         <View>
             {
-                map(menuOptions, (menu, index) => {
+                map(menuOptions, (menu, index) => (
                     <ListItem
                         key={index}
                         style={styles.menuItem}
@@ -111,7 +90,7 @@ export default function AccountOptions({ user, toastRef, setReloadUser }) {
                             color={menu.iconColorRight}
                         />
                     </ListItem>
-                })
+                ))
             }
 
             <Modal isVisible={showModal} setVisible={setShowModal}>

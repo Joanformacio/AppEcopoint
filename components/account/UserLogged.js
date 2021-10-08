@@ -11,7 +11,7 @@ import { getAvatarUser } from '../../service/Service'
 
 export default function UserLogged({ dataUser, setLoading, setLoadingText }) {
     const { avatar, username, name, surname, id } = dataUser
-    const [urlavatar, setUrlavatar] = useState("")
+    const [urlavatar, setUrlavatar] = useState(null)
 
     let urlStorage = "file:///data/user/0/host.exp.exponent/cache/ExperienceData/UNVERIFIED-192.168.18.57-ecopoint/ImagePicker/"
     const params = { userAvatar: avatar, username }
@@ -24,21 +24,23 @@ export default function UserLogged({ dataUser, setLoading, setLoadingText }) {
         getImageavatar()
     }, [])*/
 
-    const getAvatarUser = async () => {
+    const loadAvatarUser = async () => {
         try {
             let result = await loadImageFromGallery([1, 1]).then(result => result)
-            const { status, image } = result
+
+            const { status, url } = result
+
             if (!status) {
                 return
             }
             setLoadingText(prevText => { prevText, "Actualizando imagen.." })
-            setUrlavatar(image)
-
+            setUrlavatar(prevurl => ({ prevurl, ...url }))
+            console.log(urlavatar)
 
         } catch (error) {
             console.error(error)
         }
-        console.log("funcion de reload foto")
+
 
     }
 
@@ -48,9 +50,9 @@ export default function UserLogged({ dataUser, setLoading, setLoadingText }) {
             <Avatar
                 rounded
                 size="large"
-                onPress={getAvatarUser}
+                onPress={loadAvatarUser}
                 source={
-                    urlavatar ? { uri: urlavatar } : require("../../assets/avatar-default.jpg")
+                    urlavatar ? { uri: urlavatar.uri } : require("../../assets/avatar-default.jpg")
                 }
             />
             <View style={styles.infoUser}>

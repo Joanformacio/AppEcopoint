@@ -139,12 +139,18 @@ export const getCurrentUser = async () => {
     return JSON.parse(user)
 }
 
-export const updateUser = async (user, token) => {
-    if (user != null || user != undefined) {
+export const updateUser = async (userData, token) => {
+    console.log(userData)
+
+    const responseStatus = {
+        success: "",
+        response: null
+    }
+    if (userData) {
 
         let myToken = 'Bearer '.concat(token)
 
-        data.username = JSON.stringify(username)
+
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -155,14 +161,18 @@ export const updateUser = async (user, token) => {
 
         try {
 
-            //const response = await axios.put(baseURL + "users", user, config)
-
-            return response = "service to back end"
+            responseStatus.response = await axios.put(baseURL + "users", userData, config).then(res => res)
+            console.log("users put: ", responseStatus.response)
+            responseStatus.success = "true"
+            return responseStatus
         } catch (error) {
-            return error.message
+            responseStatus.success = "false"
+            responseStatus.response = error.message
+            return responseStatus
         }
     } else {
-        console.log("User", user)
+        responseStatus.success = "false"
+        return responseStatus
     }
 
 }

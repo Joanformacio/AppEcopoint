@@ -1,4 +1,4 @@
-
+import { isEmpty, isEqual } from "lodash";
 
 export const validateEmail = (email) => {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -23,4 +23,31 @@ export const validateConfirm = (confirm, password) => {
     }
 
     return isValidateConfirm
+}
+
+export const validateNameSurname = (nameuser, surname) => {
+    const isValidate = { message: "", isValid: true }
+
+    if (isEmpty(nameuser)) {
+        isValidate.isValid = false;
+        isValidate.message = "Nombre no puede estar vacio"
+    }
+
+    if (isEmpty(surname)) {
+        isValidate.isValid = false;
+        isValidate.message = "Apellido no puede estar vacio"
+    }
+
+    return isValidate
+}
+
+export const validateCompareSameName = (oldName, newname) => {
+    const isValidate = { message: "", isValid: true }
+
+    if (isEqual(oldName, newname)) {
+        isValidate.isValid = false;
+        isValidate.message = "No has modificado el nombre"
+    }
+
+    return isValidate
 }

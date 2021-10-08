@@ -4,22 +4,27 @@ import { Alert } from 'react-native'
 
 
 export const loadImageFromGallery = async (array) => {
-    const response = { status: false, image: null }
+    const response = { status: false, url: null }
 
-    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-        alert("Permission to access camera roll is required!");
-        return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+        return response
     }
+
     const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: array
     })
+
+
+
     if (result.cancelled) {
         return response
+    } else {
+        response.status = true
+        response.url = result
     }
-    response.status = true
-    response.image = result.uri
+
     return response
 }

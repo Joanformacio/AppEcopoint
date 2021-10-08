@@ -1,57 +1,64 @@
 
 import React, { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { isEmpty } from 'lodash'
 import { Button, Input } from 'react-native-elements'
 
-import { } from '../../service/Service'
+import { validateNameSurname, validateCompareSameName } from '../../validations/ValidatesForm'
+import { updateUser, getCurrentUser } from '../../service/Service'
 
-export default function UpdateNameSurname({ user, setShowModal, toastRef, setReloadUser }) {
+export default function UpdateNameSurname({ dataUser, setShowModal, toastRef, setReloadUser }) {
 
-    if (!user) return
+    if (!dataUser) return
 
-    const [newName, setNewName] = useState(null)
-    const [newSurname, setNewSurname] = useState(null)
+    const [newName, setNewName] = useState("")
+    const [newSurname, setNewSurname] = useState(dataUser.surname)
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(false)
+    let resultUpdate = null
 
-    const onsubmit = async () => {
+    const onSubmit = async () => {
 
-        if (!validateForm(newName, "Nombre")) {
+        const confirmIsvalidNameSurname = validateNameSurname(newName, newSurname)
+        const compareOldNewName = validateCompareSameName(dataUser.name, newName)
+
+        if (!confirmIsvalidNameSurname.isValid) {
+            setError(null)
+            setError(confirmIsvalidNameSurname.message)
             return
         }
 
-        if (!validateForm(newSurname, "Apellido")) {
+        if (!compareOldNewName.isValid) {
+            setError(null)
+            setError(compareOldNewName.message)
             return
         }
 
         setLoading(true)
-        user.name = newName
-        user.surname = newSurname
-        let resultUpdate = await updateUser(user)
+        dataUser.name = newName
+        dataUser.surname = newSurname
+        try {
+            const userlogged = await getCurrentUser()
+            const { token } = userlogged
+            resultUpdate = await updateUser(dataUser, token)
+
+        } catch (error) {
+            setError(error.message)
+        }
+
 
         setLoading(false)
-        if (resultUpdate !== "service to back end") {
-            setError("No se pudo actualizar el nombre")
+        if (!resultUpdate) {
+            setError("No se pudo actualizar nombre y apellido")
             return
         }
 
         setReloadUser(true)
-        toastRef.current.show("Se ha actualizado el nombre", 3000)
+        toastRef.current.show("Se ha actualizado nombre y apellidos", 3000)
         setShowModal(false)
 
     }
 
-    const validateForm = ({ campo, tipo }) => {
-        setError(null)
-        if (isEmpty(campo)) {
-            setError(`Debes ingresar  ${tipo}.`)
-            return false
-        }
 
-        return true
-
-    }
 
 
     return (
@@ -59,7 +66,7 @@ export default function UpdateNameSurname({ user, setShowModal, toastRef, setRel
             <Input
                 placeholders="Actualiza el nombre"
                 containerStyle={styles.input}
-                defaultValue={name}
+                defaultValue={dataUser.name}
                 onChange={(e) => setNewName(e.nativeEvent.text)}
                 errorMessage={error}
                 rightIcon={{
@@ -71,7 +78,7 @@ export default function UpdateNameSurname({ user, setShowModal, toastRef, setRel
             <Input
                 placeholders="Actualiza el apellido"
                 containerStyle={styles.input}
-                defaultValue={name}
+                defaultValue={dataUser.surname}
                 onChange={(e) => setNewSurname(e.nativeEvent.text)}
                 errorMessage={error}
                 rightIcon={{
@@ -84,7 +91,7 @@ export default function UpdateNameSurname({ user, setShowModal, toastRef, setRel
                 title="Cambiar Nombre"
                 containerStyle={styles.btnContainer}
                 buttonStyle={styles.btn}
-                onPress={onsubmit}
+                onPress={onSubmit}
                 loading={loading}
             />
         </View>
