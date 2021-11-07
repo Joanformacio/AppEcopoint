@@ -1,20 +1,25 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
-import { Button, Icon } from 'react-native-elements'
+import { StyleSheet, Image } from 'react-native'
+
+
 
 export default function AddLocation() {
     return (
         <Image
-            source={require('../../assets/addLocation.png')}
+            style={styles.iconlocation}
+            source={require('./../../assets/addlocation.png')}
         />
     )
 }
 
 const styles = StyleSheet.create({
-    image: {
-        width: 50,
-        height: 50,
+    iconlocation: {
+        width: 40,
+        height: 40,
         borderRadius: 100,
-        opacity: .5
+        bottom: 80,
+        right: 20,
+        opacity: 0.7,
+        position: "absolute",
     },
 })

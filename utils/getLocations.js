@@ -10,9 +10,15 @@ export const getCurrentLocations = async () => {
     }
     response.status = status
     response.msg = 'You have acces location'
-    const position = await Location.getCurrentPositionAsync({});
-    response.location.latitude = position.coords.latitude
-    response.location.longitude = position.coords.longitude
+    try {
+        const position = await Location.getCurrentPositionAsync({});
+        response.location.latitude = position.coords.latitude
+        response.location.longitude = position.coords.longitude
+    } catch (error) {
+        console.error(error.message)
+    }
+
+
     return response
 
 }

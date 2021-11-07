@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import MyMap from '../components/mapcomponets/MyMap'
-import AddLocation from '../components/mapcomponets/AddLocation'
+
 
 export default function Maplocations() {
     return (
@@ -9,7 +9,7 @@ export default function Maplocations() {
         //a aadlocation s'ha de fixar a la cantonada dreta de la pantalla
         <View style={styles.container}>
             <MyMap>
-                <AddLocation />
+
             </MyMap>
         </View>
     )
